@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5] - 2023-01-13
+
+### Added
+- Nested subgraphs
+- Subgraph's label attribute
+
 ## [0.4.1] - 2021-05-03
 
 ### Added
