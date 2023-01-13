@@ -8,6 +8,9 @@ public struct Subgraph: Hashable {
         self.id = id
     }
 
+    /// Subgraphs contained by the subgraph.
+    public private(set) var subgraphs: [Subgraph] = []
+
     public private(set) var nodes: [Node] = []
 
     public private(set) var edges: [Edge] = []
@@ -18,22 +21,46 @@ public struct Subgraph: Hashable {
      Returns whether the subgraph is empty.
 
      A subgraph is considered to be empty if it
+     has no subgraphs,
      has no edges,
      has no nodes with attributes, and
      has no attributes itself.
      */
     public var isEmpty: Bool {
-        return edges.isEmpty &&
+        return subgraphs.isEmpty &&
+                edges.isEmpty &&
                 attributes.dictionaryValue.isEmpty &&
                 nodes.filter { !$0.attributes.dictionaryValue.isEmpty }.isEmpty
     }
 
+    public mutating func append(_ subgraph: Subgraph) {
+        subgraphs.append(subgraph)
+    }
+
+    public mutating func append<S>(contentsOf subgraphs: S) where S.Element == Subgraph, S: Sequence {
+        for subgraph in subgraphs {
+            self.subgraphs.append(subgraph)
+        }
+    }
+    
     public mutating func append(_ node: @autoclosure () -> Node) {
         nodes.append(node())
+    }
+    
+    public mutating func append<S>(contentsOf nodes: S) where S.Element == Node, S: Sequence {
+        for node in nodes {
+            self.nodes.append(node)
+        }
     }
 
     public mutating func append(_ edge: @autoclosure () -> Edge) {
         edges.append(edge())
+    }
+    
+    public mutating func append<S>(contentsOf edges: S) where S.Element == Edge, S: Sequence {
+        for edge in edges {
+            self.edges.append(edge)
+        }
     }
 
     public subscript<T>(dynamicMember member: WritableKeyPath<Attributes, T>) -> T {
@@ -173,6 +200,18 @@ extension Subgraph {
         public var url: URL?
 
         // MARK: - Label Attributes
+        
+        /**
+         > Text label attached to objects. Different from ids labels can contain almost any special character, but not ".
+
+         If a node does not have the attribute label, the value of the attribute id is used. If a node shall not have a label, label="" must be used.
+
+         The escape sequences "\n", "\l" and "\r" divide the label into lines, centered, left-justified and right-justified, respectively.
+
+         Change the appearance of the labels with the attributes fontname, fontcolor and fontsize.
+         */
+        @Attribute("label")
+        public var label: String?
 
         /// > The name of the used font. (System dependend)
         /// > The font size for object labels.
@@ -274,6 +313,7 @@ extension Subgraph.Attributes {
             _fontName,
             _fontSize,
             _textColor,
+            _label,
             _labelFloat,
             _noJustify,
             _constraint,

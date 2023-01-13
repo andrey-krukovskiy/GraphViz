@@ -69,6 +69,7 @@ public struct DOTEncoder {
         var lines: [String] = []
 
         lines.append(contentsOf: encode(subgraph.attributes, in: graph).map{ $0.indented(by: indentation) })
+        lines.append(contentsOf: subgraph.subgraphs.map { encode($0, in: graph).indented(by: indentation) })
         lines.append(contentsOf: subgraph.nodes.compactMap { encode($0, in: graph)?.indented(by: indentation) })
         lines.append(contentsOf: subgraph.edges.map { encode($0, in: graph).indented(by: indentation) })
 
